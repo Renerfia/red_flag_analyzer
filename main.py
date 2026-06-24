@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 agent = Agent(
-    model="google:gemini-3.5-flash",
+    model="groq:llama-3.3-70b-versatile",
     instructions=(
         "You are an expert legal and document risk analyst. "
         "Your task is to review the provided text and identify any 'red flags'—such as "
@@ -28,6 +28,10 @@ agent = Agent(
     output_type=RedFlagReport
 
 )
+
+def red_flag_analyzer(query_text):
+    return agent.run_sync(query_text).output
+
 
 if __name__ == "__main__":
     sample_document = """
