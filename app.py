@@ -9,7 +9,7 @@ from main import red_flag_analyzer
 # 1. User uploads .txt or .doc file via Streamlit UI
 # 2. File is read and text is extracted
 # 3. Text is passed to red_flag_analyzer() from main.py
-# 4. red_flag_analyzer() sends text to AI model (Google Gemini)
+# 4. red_flag_analyzer() sends text to AI model 
 # 5. AI analyzes and returns RedFlagReport with identified red flags
 # 6. Results are displayed in Streamlit UI with severity color-coding
 # ============================================================================
@@ -101,11 +101,12 @@ if uploaded_file is not None:
         st.markdown(f"**Document Size:** {len(document_text)} characters")
         st.markdown("---")
         
-        # Step 3: Analyze document with red_flag_analyzer
+        
         if st.button("🔍 Analyze for Red Flags", type="primary"):
-            st.session_state.show_disclaimer=True
-
-        if st.session_state.get("show_disclaimer",False):
+            st.session_state.show_disclaimer=True #create a disclaimer dict whenever the button is pressed in st session state with default value True
+                                                  
+        #checks if the following dict is in the state or not. If not returns false and the if block doesn't run
+        if st.session_state.get("show_disclaimer",False): 
             st.warning(
                 "This tool is designed to assist you in identifying potential "
                 "risks and red flags in documents. However, it should not be considered legal advice. "
@@ -116,8 +117,8 @@ if uploaded_file is not None:
             if st.checkbox("I understand and wish to proceed with the analysis"):
                 with st.spinner("🤖 AI is analyzing your document..."):
                     try:
-                        # Call the async red_flag_analyzer function
-                        # Streamlit runs on the main thread, so we handle async properly
+                        # Call the red_flag_analyzer function
+                        
                         result = red_flag_analyzer(document_text)
                         
                         # Step 4: Display results
@@ -126,11 +127,12 @@ if uploaded_file is not None:
                         
                         # Display document summary
                         st.subheader("📝 Document Summary")
-                        st.info(result.document_summary)
+                        st.info(result.document_summary)  
                         
                         # Display red flags
                         st.subheader(f"🚩 Red Flags Found: {len(result.red_flags)}")
                         
+                        #if result returns any red flag
                         if result.red_flags:
                             # Color mapping for severity levels
                             severity_colors = {
@@ -141,13 +143,6 @@ if uploaded_file is not None:
                             
                             # Display each red flag in a card-like format
                             for idx, flag in enumerate(result.red_flags, 1):
-                                # Determine color based on severity
-                                if flag.severity == "High":
-                                    color = "#ff4444"
-                                elif flag.severity == "Medium":
-                                    color = "#ffaa00"
-                                else:
-                                    color = "#44aa44"
                                 
                                 # Create a container for each red flag
                                 with st.container(border=True):
