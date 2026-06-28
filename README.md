@@ -2,6 +2,9 @@
 
 Red Flag Analyzer is a Streamlit application that scans uploaded text and Word documents for risky or unfair contract terms. It uses an AI-powered document risk analysis agent to identify red flags, classify their severity, and explain why they may be problematic.
 
+## Preview
+![Alt Text](images/preview.png)
+
 ## Features
 
 - Upload `.txt` or `.docx` documents
