@@ -13,7 +13,8 @@ from main import red_flag_analyzer
 # 5. AI analyzes and returns RedFlagReport with identified red flags
 # 6. Results are displayed in Streamlit UI with severity color-coding
 # ============================================================================
-
+if "show_disclaimer" not in st.session_state:
+    st.session_state.show_disclaimer = None
 # ============================================================================
 # PAGE CONFIGURATION
 # ============================================================================
@@ -31,7 +32,7 @@ st.markdown("Upload a document to identify potential risks and unfair clauses")
 # SIDEBAR - FILE UPLOAD
 # ============================================================================
 st.sidebar.header("📄 Upload Document")
-st.sidebar.markdown("Supported formats: `.txt`, `.doc`, `.docx`")
+st.sidebar.markdown("Supported formats: `.txt`, `.docx`")
 
 # File uploader widget
 uploaded_file = st.sidebar.file_uploader(
@@ -53,9 +54,10 @@ def extract_text_from_file(uploaded_file):
     Returns:
         str: Extracted text from the file
     """
-    file_extension = Path(uploaded_file.name).suffix.lower()
+    file_extension = Path(uploaded_file.name).suffix.lower() #gets the extension of the file
     
     try:
+        #checking which extension does it belong
         if file_extension == ".txt":
             # For .txt files, decode directly
             text = uploaded_file.getvalue().decode("utf-8")
@@ -106,74 +108,77 @@ if uploaded_file is not None:
             st.session_state.show_disclaimer=True #create a disclaimer dict whenever the button is pressed in st session state with default value True
                                                   
         #checks if the following dict is in the state or not. If not returns false and the if block doesn't run
-        if st.session_state.get("show_disclaimer",False): 
-            st.warning(
-                "This tool is designed to assist you in identifying potential "
-                "risks and red flags in documents. However, it should not be considered legal advice. "
-                "**Please consult with a qualified legal professional before making any final decisions.** "
-                "This analysis is for awareness purposes only.",
-                icon="⚠️")
-            
-            if st.checkbox("I understand and wish to proceed with the analysis"):
-                with st.spinner("🤖 AI is analyzing your document..."):
-                    try:
-                        # Call the red_flag_analyzer function
-                        
-                        result = red_flag_analyzer(document_text)
-                        
-                        # Step 4: Display results
-                        st.success("✅ Analysis complete!")
-                        st.markdown("---")
-                        
-                        # Display document summary
-                        st.subheader("📝 Document Summary")
-                        st.info(result.document_summary)  
-                        
-                        # Display red flags
-                        st.subheader(f"🚩 Red Flags Found: {len(result.red_flags)}")
-                        
-                        #if result returns any red flag
-                        if result.red_flags:
-                            # Color mapping for severity levels
-                            severity_colors = {
-                                "High": "🔴",
-                                "Medium": "🟡",
-                                "Low": "🟢"
-                            }
+        if st.session_state.show_disclaimer:
+            if st.session_state.show_disclaimer==True: 
+                st.warning(
+                    "This tool is designed to assist you in identifying potential "
+                    "risks and red flags in documents. However, it should not be considered legal advice. "
+                    "**Please consult with a qualified legal professional before making any final decisions.** "
+                    "This analysis is for awareness purposes only.",
+                    icon="⚠️")
+                
+                if st.checkbox("I understand and wish to proceed with the analysis"):
+                    st.session_state.show_disclaimer=False
+
+                    with st.spinner("🤖 AI is analyzing your document..."):
+                        try:
+                            # Call the red_flag_analyzer function
                             
-                            # Display each red flag in a card-like format
-                            for idx, flag in enumerate(result.red_flags, 1):
+                            result = red_flag_analyzer(document_text) #from main.py
+                            
+                            # Step 4: Display results
+                            st.success("✅ Analysis complete!")
+                            st.markdown("---")
+                            
+                            # Display document summary
+                            st.subheader("📝 Document Summary")
+                            st.info(result.document_summary)  
+                            
+                            # Display red flags
+                            st.subheader(f"🚩 Red Flags Found: {len(result.red_flags)}")
+                            
+                            #if result returns any red flag
+                            if result.red_flags:
+                                # Color mapping for severity levels
+                                severity_colors = {
+                                    "High": "🔴",
+                                    "Medium": "🟡",
+                                    "Low": "🟢"
+                                }
                                 
-                                # Create a container for each red flag
-                                with st.container(border=True):
-                                    col1, col2 = st.columns([3, 1])
+                                # Display each red flag in a card-like format
+                                for idx, flag in enumerate(result.red_flags, 1):
                                     
-                                    with col1:
-                                        st.markdown(
-                                            f"### {severity_colors.get(flag.severity, '❓')} "
-                                            f"Red Flag #{idx}"
-                                        )
-                                    
-                                    with col2:
-                                        st.markdown(
-                                            f"**Severity:** `{flag.severity}`"
-                                        )
-                                    
-                                    st.markdown("**Problem Text:**")
-                                    st.code(flag.item, language="text")
-                                    
-                                    st.markdown("**Why it's a problem:**")
-                                    st.write(flag.reason)
-                                    st.markdown("---")
-                        else:
-                            st.success("✨ No red flags found! This document looks good.")
+                                    # Create a container for each red flag
+                                    with st.container(border=True):
+                                        col1, col2 = st.columns([3, 1])
+                                        
+                                        with col1:
+                                            st.markdown(
+                                                f"### {severity_colors.get(flag.severity, '❓')} "
+                                                f"Red Flag #{idx}"
+                                            )
+                                        
+                                        with col2:
+                                            st.markdown(
+                                                f"**Severity:** `{flag.severity}`"
+                                            )
+                                        
+                                        st.markdown("**Problem Text:**")
+                                        st.code(flag.item, language="text")
+                                        
+                                        st.markdown("**Why it's a problem:**")
+                                        st.write(flag.reason)
+                                        st.markdown("---")
+                            else:
+                                st.success("✨ No red flags found! This document looks good.")
+                            
+                            
                         
-                        st.session_state.show_disclaimer=False
-                    
-                    except Exception as e:
-                        st.error(f"❌ Error during analysis: {str(e)}")
-                        st.info("Make sure your `.env` file is configured with the API key.")
-            
+                        except Exception as e:
+                            st.error(f"❌ Error during analysis: {str(e)}")
+                            st.info("Make sure your `.env` file is configured with the API key.")
+                
 else:
     # Show empty state when no file is uploaded
     st.info("👈 Upload a document in the sidebar to get started!")
