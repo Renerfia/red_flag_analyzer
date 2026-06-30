@@ -1,4 +1,13 @@
-# 🚩 Red Flag Analyzer
+---
+title: AI Red Flag Analyzer
+sdk: docker
+emoji: 🚩
+colorFrom: red
+colorTo: blue
+pinned: false
+---
+
+# 🚩AI Red Flag Analyzer
 
 Red Flag Analyzer is a Streamlit application that scans uploaded text and Word documents for risky or unfair contract terms. It uses an AI-powered document risk analysis agent to identify red flags, classify their severity, and explain why they may be problematic.
 
