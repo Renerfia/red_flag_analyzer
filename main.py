@@ -21,9 +21,9 @@ from dotenv import load_dotenv
 groq_api_key = os.environ.get("GROQ_API_KEY") #for universersal api key access
 if not groq_api_key:
     load_dotenv() #for local api key access
-    
+
 model_instance=GroqModel(
-    model_name="groq:llama-3.3-70b-versatile",
+    model_name="llama-3.3-70b-versatile",
     )
 agent = Agent(
     model=model_instance,
