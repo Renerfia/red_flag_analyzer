@@ -14,11 +14,19 @@ class RedFlagReport(BaseModel):
 
 #Defining agent
 import os
+from pydantic_ai.models.groq import GroqModel
 from dotenv import load_dotenv
-load_dotenv()
 
+
+groq_api_key = os.environ.get("GROQ_API_KEY") #for universersal api key access
+if not groq_api_key:
+    load_dotenv() #for local api key access
+    
+model_instance=GroqModel(
+    model_name="groq:llama-3.3-70b-versatile",
+    )
 agent = Agent(
-    model="groq:llama-3.3-70b-versatile",
+    model=model_instance,
     instructions=(
         "You are an expert legal and document risk analyst. "
         "Your task is to review the provided text and identify any 'red flags'—such as "
