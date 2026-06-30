@@ -4,7 +4,8 @@ sdk: docker
 emoji: 🚩
 colorFrom: red
 colorTo: blue
-pinned: false
+pinned: false 
+app_port:8501
 ---
 
 # 🚩AI Red Flag Analyzer
